@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <title>循环队列</title>
+    <link rel="stylesheet" href="lib/css/frozen.css">
+</head>
+<body ontouchstart="">
+<header class="ui-header ui-header-positive ui-border-b">
+    <i class="ui-icon-return" onclick="history.back()"></i>
+    <h1>循环队列</h1>
+</header>
+<div class="ui-container">
+    <div class="ui-form ui-border-t">
+        <div class="ui-form-item ui-form-item-r ui-border-b">
+            <input type="number" placeholder="请输入一个数字" id="data">
+            <button type="button" class="ui-border-l" onclick="html_enter()">推送入队</button>
+            <a href="#" class="ui-icon-close" onclick="html_clear_num()"></a>
+        </div>
+    </div>
+    <div class="ui-btn-wrap ui-btn-group">
+        <button class="ui-btn" onclick="html_rand_enter()">
+            随机数字进队
+        </button>
+        <button class="ui-btn"  onclick="html_delete()">
+            出队
+        </button>
+    </div>
+    <ul class="ui-list ui-list-pure ui-border-tb">
+        <li class="ui-border-t">
+            <p><span>内存中的队列</span></p>
+            <h4 id="queue"></h4>
+        </li>
+        <li class="ui-border-t">
+            <p><span>实际的队列</span></p>
+            <h4 id="queue2"></h4>
+        </li>
+        <li class="ui-border-t">
+            <p><span>控制台</span></p>
+            <label>
+                <textarea id="console" style="width: 100%;height: 100px;border: none"></textarea>
+            </label>
+        </li>
+        <li class="ui-border-t">
+            <p><span>标注</span></p>
+            <h4>当色块为黑色的时候，代表空队列(队头和队尾重合)，色块为<span style="color: red">红色代表队头(出队列)</span>，
+                色块为<span style="color: blue">蓝色代表队尾(入队列)</h4>
+        </li>
+    </ul>
+    <div class="ui-footer ui-footer-stable ui-btn-group ui-border-t">
+        <button class="ui-btn" type="button" onclick="html_clear()">
+            清空控制台
+        </button>
+        <button class="ui-btn ui-btn-primary" type="button" onclick="html_source()">
+            查看源代码
+        </button>
+    </div>
+</div>
+<script src="lib/js/zepto.min.js"></script>
+<script src="lib/js/frozen.js"></script>
+<script>
+    //循环队列
+    function Queue(num) {
+        this.data = new Array(num+1);
+        this.front = 0;//头指针
+        this.rear = 0;//尾指针
+        this.maxSize = num+1;
+    }
+    //长度
+    Queue.prototype.length = function(){
+        return (this.rear-this.front+this.maxSize)%this.maxSize;
+    };
+    Queue.prototype.enterQueue = function(data){
+        if((this.rear+1)%this.maxSize==this.front){
+            //满
+            return 1;
+        }
+        this.data[this.rear] = data;
+        this.rear = (this.rear+1)%this.maxSize;
+        return 0;
+    };
+    Queue.prototype.deleteQueue = function(){
+        if(this.front == this.rear){
+            //空
+            return 1;
+        }
+        this.front = (this.front+1)%this.maxSize;
+        return 0;
+    };
+    //以下是图形界面需要的代码
+    Queue.prototype.ergodic = function () {
+        var data = '';
+        for (var i = 0; i < this.data.length; i++) {
+            var elem = '(空)';
+            if(this.data[i]!=null){
+                elem = this.data[i];
+            }
+            data += "<span id='queue"+i+"'>"+elem+"</span> ";
+        }
+        return data;
+    };
+    Queue.prototype.ergodic1 = function () {
+        var data = '';
+        for (var i = 0; i < this.length(); i++) {
+            var elem = '(空)';
+            var index = (this.front+i)%this.maxSize;
+            if(this.data[index]!=null){
+                elem = this.data[index];
+            }
+            data += elem + ' ';
+        }
+        return data;
+    };
+    var num = document.getElementById('data');
+    var con = document.getElementById('console');
+    var s = document.getElementById('queue');
+    var s1 = document.getElementById('queue2');
+    function html_enter() {
+        var data = num.value;
+        if(data.length==0){
+            alert('请输入数字');
+        }else if(isNaN(data)){
+            alert('输入的数字');
+        }else {
+            var result = queue.enterQueue(data);
+            if(result){
+                con.innerHTML += '队列已满，无法入队\n';
+                con.scrollTop=con.scrollHeight;
+            }else{
+                html_clear_num();
+                con.innerHTML += '自定义入队，入队数字：'+data+'\n';
+                con.scrollTop=con.scrollHeight;
+                updateHTML();
+            }
+        }
+    }
+    function html_rand_enter() {
+        var num = parseInt(Math.random()*10000);
+        var result = queue.enterQueue(num);
+        if(result){
+            con.innerHTML += '队列已满，无法入队\n';
+            con.scrollTop=con.scrollHeight;
+        }else{
+            html_clear_num();
+            con.innerHTML += '随机数字入队,入队数字：'+num+'\n';
+            con.scrollTop=con.scrollHeight;
+            updateHTML();
+        }
+    }
+    function html_delete() {
+        var result = queue.deleteQueue();
+        if(result==1){
+            con.innerHTML += '队列是空的，无法出队\n';
+            con.scrollTop=con.scrollHeight;
+        }else{
+            con.innerHTML += '出队成功\n';
+            con.scrollTop=con.scrollHeight;
+            updateHTML();
+        }
+    }
+    function html_clear() {
+        con.innerHTML = '';
+    }
+    function html_source() {
+        window.location.href = 'http://www.jianshu.com/p/747d0324fa11';
+    }
+    function html_clear_num() {
+        num.value = '';
+    }
+    var queue = new Queue(10);
+    con.innerHTML += '已经新建了一个长度为10的队列\n';
+    function updateHTML() {
+        s.innerHTML = queue.ergodic();
+        s1.innerHTML = queue.ergodic1();
+        var front = document.getElementById('queue'+queue.front);
+        var rear = document.getElementById('queue'+queue.rear);
+        if(queue.front==queue.rear){
+            front.style.backgroundColor="#000";
+            front.style.color="#FFF";
+        }else{
+            front.style.color="red";
+            rear.style.color="blue";
+        }
+    }
+    updateHTML();
+</script>
+</body>
+</html>

@@ -4,11 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
-    <title>FrozenUI Demo</title>
+    <title>栈</title>
     <link rel="stylesheet" href="lib/css/frozen.css">
 </head>
 <body ontouchstart="">
 <header class="ui-header ui-header-positive ui-border-b">
+    <i class="ui-icon-return" onclick="history.back()"></i>
     <h1>栈</h1>
 </header>
 <div class="ui-container">
@@ -16,14 +17,16 @@
         <div class="ui-form-item ui-form-item-r ui-border-b">
             <input type="number" placeholder="请输入一个数字" id="data">
             <button type="button" class="ui-border-l" onclick="html_push()">推送入栈</button>
-            <a href="#" class="ui-icon-close"></a>
+            <a href="#" class="ui-icon-close" onclick="html_clear_num()"></a>
         </div>
-        <div class="ui-form-item ui-form-item-link ui-border-b" onclick="html_pop()">
-            <a href="#">出栈</a>
-        </div>
-        <div class="ui-form-item ui-form-item-link ui-border-b" onclick="html_rand_push()">
-            <a href="#">随机数字进栈</a>
-        </div>
+    </div>
+    <div class="ui-btn-wrap ui-btn-group">
+        <button class="ui-btn" onclick="html_rand_push()">
+            随机数字进栈
+        </button>
+        <button class="ui-btn"  onclick="html_pop()">
+            出栈
+        </button>
     </div>
     <ul class="ui-list ui-list-pure ui-border-tb">
         <li class="ui-border-t">
@@ -38,10 +41,10 @@
         </li>
     </ul>
     <div class="ui-footer ui-footer-stable ui-btn-group ui-border-t">
-        <button class="ui-btn-lg" type="button" onclick="html_clear()">
+        <button class="ui-btn" type="button" onclick="html_clear()">
             清空控制台
         </button>
-        <button class="ui-btn-lg ui-btn-primary" type="button" onclick="html_source()">
+        <button class="ui-btn ui-btn-primary" type="button" onclick="html_source()">
             查看源代码
         </button>
     </div>
@@ -100,7 +103,9 @@
             alert('输入的数字');
         }else {
             stack.push(new Node(data));
+            html_clear_num();
             con.innerHTML += '自定义入栈，入栈数字：'+data+'\n';
+            con.scrollTop=con.scrollHeight;
             s.innerHTML  = stack.ergodic();
         }
     }
@@ -108,6 +113,7 @@
         var num = parseInt(Math.random()*10000);
         stack.push(new Node(num));
         con.innerHTML += '随机数字入栈,入栈数字：'+num+'\n';
+        con.scrollTop=con.scrollHeight;
         s.innerHTML  = stack.ergodic();
     }
     function html_pop() {
@@ -119,8 +125,10 @@
         }
         if(result == -1){
             con.innerHTML += '当前栈为空栈，无法出栈：\n';
+            con.scrollTop=con.scrollHeight;
         }else{
             con.innerHTML += '出栈，出栈数字：'+result.data+'\n';
+            con.scrollTop=con.scrollHeight;
         }
     }
     function html_clear() {
@@ -128,6 +136,9 @@
     }
     function html_source() {
         window.location.href = 'http://www.jianshu.com/p/a3389fdab4cf';
+    }
+    function html_clear_num() {
+        num.value = '';
     }
 </script>
 </body>
