@@ -17,14 +17,14 @@
         <label>
             输入主串
         </label>
-        <input type="text" placeholder="请输入主串" value="ABCABCDABCDEA" id="data1">
+        <input type="text" placeholder="请输入主串" value="ABCABCDCCCABCDEAB" id="data1">
         <a href="#" class="ui-icon-close" onclick="html_clear_str1()"></a>
     </div>
     <div class="ui-form-item ui-border-b">
         <label>
             输入子串
         </label>
-        <input type="text" placeholder="请输入子串" value="ABCDEA" id="data2">
+        <input type="text" placeholder="请输入子串" value="ABCDEAB" id="data2">
         <a href="#" class="ui-icon-close" onclick="html_clear_str2()"></a>
     </div>
     <ul class="ui-list ui-list-pure ui-border-tb">
@@ -157,7 +157,10 @@
                         m = partMatchValue[m - 1] - 1;
                         compareString += '<td>CHANGE</td>';
                     } else {
-                        compareString += '<td></td>';
+                        compareString += '<td>NO</td>';
+                        compareString += '</tr>';
+                        con.innerHTML += 'no:当前头部和头部不匹配\n';
+                        compareTable.innerHTML += compareString;
                         break;
                     }
                 }
