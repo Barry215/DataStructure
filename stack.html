@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <title>FrozenUI Demo</title>
+    <link rel="stylesheet" href="lib/css/frozen.css">
+</head>
+<body ontouchstart="">
+<header class="ui-header ui-header-positive ui-border-b">
+    <h1>栈</h1>
+</header>
+<div class="ui-container">
+    <div class="ui-form ui-border-t">
+        <div class="ui-form-item ui-form-item-r ui-border-b">
+            <input type="number" placeholder="请输入一个数字" id="data">
+            <button type="button" class="ui-border-l" onclick="html_push()">推送入栈</button>
+            <a href="#" class="ui-icon-close"></a>
+        </div>
+        <div class="ui-form-item ui-form-item-link ui-border-b" onclick="html_pop()">
+            <a href="#">出栈</a>
+        </div>
+        <div class="ui-form-item ui-form-item-link ui-border-b" onclick="html_rand_push()">
+            <a href="#">随机数字进栈</a>
+        </div>
+    </div>
+    <ul class="ui-list ui-list-pure ui-border-tb">
+        <li class="ui-border-t">
+            <p><span>当前堆栈</span></p>
+            <h4 id="stack">(空)</h4>
+        </li>
+        <li class="ui-border-t">
+            <p><span>控制台</span></p>
+            <label>
+                <textarea id="console" style="width: 100%;height: 100px;border: none"></textarea>
+            </label>
+        </li>
+    </ul>
+    <div class="ui-footer ui-footer-stable ui-btn-group ui-border-t">
+        <button class="ui-btn-lg" type="button" onclick="html_clear()">
+            清空控制台
+        </button>
+        <button class="ui-btn-lg ui-btn-primary" type="button" onclick="html_source()">
+            查看源代码
+        </button>
+    </div>
+</div>
+<script src="lib/js/zepto.min.js"></script>
+<script src="lib/js/frozen.js"></script>
+<script>
+    function Node(data) {
+        this.data = data;
+    }
+    function Stack(){
+        this.top = -1;
+        this.data = [];
+    }
+    Stack.prototype.push = function(node){
+        this.top++;
+        this.data[this.top] = node;
+        return 0;
+    };
+    Stack.prototype.pop = function(){
+        if(this.top==-1){
+            return -1;
+        }
+        var data = this.data[this.top];
+        this.data[this.top] = null;
+        this.top--;
+        return data;
+    };
+    //遍历方法
+    Stack.prototype.ergodic = function(){
+        var data = '';
+        for (var i = 0; i < this.data.length; i++) {
+            if(this.data[i]!=null){
+                data += this.data[i].data+' ';
+            }
+        }
+        return data;
+    };
+    Stack.prototype.length = function () {
+        var i = 0;
+        while (this.data[i]!=null){
+            i++;
+        }
+        return i;
+    };
+    //以下是页面上的元素
+    var num = document.getElementById('data');
+    var con = document.getElementById('console');
+    var s = document.getElementById('stack');
+    var stack = new Stack();
+    function html_push() {
+        var data = num.value;
+        if(data.length==0){
+            alert('请输入数字');
+        }else if(isNaN(data)){
+            alert('输入的数字');
+        }else {
+            stack.push(new Node(data));
+            con.innerHTML += '自定义入栈，入栈数字：'+data+'\n';
+            s.innerHTML  = stack.ergodic();
+        }
+    }
+    function html_rand_push() {
+        var num = parseInt(Math.random()*10000);
+        stack.push(new Node(num));
+        con.innerHTML += '随机数字入栈,入栈数字：'+num+'\n';
+        s.innerHTML  = stack.ergodic();
+    }
+    function html_pop() {
+        var result = stack.pop();
+        if(stack.length()==0){
+            s.innerHTML = '(空)';
+        }else{
+            s.innerHTML = stack.ergodic();
+        }
+        if(result == -1){
+            con.innerHTML += '当前栈为空栈，无法出栈：\n';
+        }else{
+            con.innerHTML += '出栈，出栈数字：'+result.data+'\n';
+        }
+    }
+    function html_clear() {
+        con.innerHTML = '';
+    }
+    function html_source() {
+        window.location.href = 'http://www.jianshu.com/p/a3389fdab4cf';
+    }
+</script>
+</body>
+</html>
