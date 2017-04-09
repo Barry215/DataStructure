@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <title>KMP算法</title>
+    <link rel="stylesheet" href="lib/css/frozen.css">
+</head>
+<body ontouchstart="" style="padding-bottom: 60px">
+<header class="ui-header ui-header-positive ui-border-b">
+    <i class="ui-icon-return" onclick="history.back()"></i>
+    <h1>KMP算法</h1>
+</header>
+<div class="ui-container">
+    <div class="ui-form-item ui-border-b">
+        <label>
+            输入主串
+        </label>
+        <input type="text" placeholder="请输入主串" value="ABCABCDABCDEA" id="data1">
+        <a href="#" class="ui-icon-close" onclick="html_clear_str1()"></a>
+    </div>
+    <div class="ui-form-item ui-border-b">
+        <label>
+            输入子串
+        </label>
+        <input type="text" placeholder="请输入子串" value="ABCDEA" id="data2">
+        <a href="#" class="ui-icon-close" onclick="html_clear_str2()"></a>
+    </div>
+    <ul class="ui-list ui-list-pure ui-border-tb">
+        <li class="ui-border-t">
+            <p><span>NEXT数组</span></p>
+            <table class="ui-table ui-border">
+                <thead>
+                <tr>
+                    <th>子串</th>
+                    <th>前缀</th>
+                    <th>后缀</th>
+                    <th>重复量</th>
+                </tr>
+                </thead>
+                <tbody id="nextTable">
+                </tbody>
+            </table>
+        </li>
+        <li class="ui-border-t">
+            <p><span>对比过程</span></p>
+            <table class="ui-table ui-border">
+                <thead>
+                <tr>
+                    <th>主串</th>
+                    <th>主串内位置</th>
+                    <th>子串</th>
+                    <th>子串内位置</th>
+                    <th>查找状态</th>
+                </tr>
+                </thead>
+                <tbody id="compareTable">
+                </tbody>
+            </table>
+        </li>
+        <li class="ui-border-t">
+            <p><span>控制台</span></p>
+            <label>
+                <textarea id="console" style="width: 100%;height: 200px;border: none"></textarea>
+            </label>
+        </li>
+    </ul>
+    <div class="ui-footer ui-footer-stable ui-btn-group ui-border-t">
+        <button class="ui-btn ui-btn-danger" type="button" onclick="html_next()" id="nextBtn">
+            开始
+        </button>
+        <button class="ui-btn" type="button" onclick="html_clear()">
+            清空控制台
+        </button>
+        <button class="ui-btn ui-btn-primary" type="button" onclick="html_source()">
+            查看源代码
+        </button>
+    </div>
+</div>
+<script src="lib/js/zepto.min.js"></script>
+<script src="lib/js/frozen.js"></script>
+<script>
+    var str1 = document.getElementById('data1');
+    var str2 = document.getElementById('data2');
+    var con = document.getElementById('console');
+    var nextTable = document.getElementById('nextTable');
+    var compareTable = document.getElementById('compareTable');
+    function kmpGetStrPartMatchValue(str) {
+        var prefix = [];
+        var suffix = [];
+        var partMatch = [];
+        for (var i = 0; i < str.length; i++) {
+            var newStr = str.substring(0, i + 1);
+            if (newStr.length == 1) {
+                partMatch[i] = 0;
+                nextTable.innerHTML += '<tr><td>' + newStr + '</td><td>-</td><td>-</td><td>0</td></tr>'
+            } else {
+                for (var k = 0; k < i; k++) {
+                    prefix[k] = newStr.slice(0, k + 1);
+                    suffix[k] = newStr.slice(-k - 1);
+                    if (prefix[k] == suffix[k]) {
+                        partMatch[i] = prefix[k].length;
+                        nextTable.innerHTML += '<tr><td>' + newStr + '</td><td>' + prefix[k]
+                            + '</td><td>' + suffix[k]
+                            + '</td><td>' + partMatch[i] + '</td></tr>'
+                    }
+                }
+                if (!partMatch[i]) {
+                    nextTable.innerHTML += '<tr><td>' + newStr + '</td><td>-</td><td>-</td><td>0</td></tr>';
+                    partMatch[i] = 0;
+                }
+            }
+        }
+        prefix.length = 0;
+        suffix.length = 0;
+        return partMatch;
+    }
+    /**
+     * @return {number}
+     */
+    function KMP(sourceStr, targetStr) {
+        var partMatchValue = kmpGetStrPartMatchValue(targetStr);
+        con.innerHTML += 'next数组为' + partMatchValue + '\n';
+        var result = false;
+        var i = 0;
+        for (i = 0; i < sourceStr.length; i++) {
+            for (var m = 0; m < targetStr.length; m++) {
+                var compareString = '';
+                compareString += '<tr>';
+                compareString += '<td>' + sourceStr.charAt(i)
+                    + '</td><td>' + i
+                    + '</td><td>' + targetStr.charAt(m) + '</td><td>' + m
+                    + '</td>';
+                if (targetStr.charAt(m) == sourceStr.charAt(i)) {
+                    if (m == targetStr.length - 1) {
+                        con.innerHTML +='ok:匹配成功,位置是'+(i - targetStr.length + 1)+'('+targetStr.charAt(m)+'与'+sourceStr.charAt(i)+')\n';
+                        con.scrollTop=con.scrollHeight;
+                        result = true;
+                        compareString += '<td>OK</td>';
+                        compareString += '</tr>';
+                        compareTable.innerHTML += compareString;
+                        break;
+                    } else {
+                        con.innerHTML +='wait:需要等待进一步的匹配'+'('+targetStr.charAt(m)+'与'+sourceStr.charAt(i)+')\n';
+                        console.info('m!=targetStr.length-1,说明暂时不匹配,i++');
+                        compareString += '<td>WAIT</td>';
+                        i++;
+                    }
+                } else {
+                    if (m > 0) {
+                        console.info('m>0 && partMatchValue[m-1] > 0,说明目前需要对子串的m进行重新定位');
+                        console.info('令m=' + (partMatchValue[m - 1] - 1) + '(next数组为+' + partMatchValue + '第' + (m - 1) + '位的数字-1)');
+                        con.innerHTML += 'change:当前发生了不匹配，子串第'+m+'位:'+targetStr.charAt(m)+'和主串第'+i+'位:'+sourceStr.charAt(i)+'\n';
+                        con.innerHTML += 'change:主串索引继续前进，子串索引改为 对应next数组上的前一个数值\n';
+                        con.innerHTML += 'change:子串改变后的索引值为 '+partMatchValue[m - 1]+'(next['+(m-1)+']='+partMatchValue[m - 1]+')\n';
+                        m = partMatchValue[m - 1] - 1;
+                        compareString += '<td>CHANGE</td>';
+                    } else {
+                        compareString += '<td></td>';
+                        break;
+                    }
+                }
+                compareString += '</tr>';
+                compareTable.innerHTML += compareString;
+            }
+            if (result) {
+                break;
+            }
+        }
+        if (result) {
+            return i - targetStr.length + 1;
+        } else {
+            con.innerHTML += '最终结果表示：两个串不存在匹配关系';
+            con.scrollTop=con.scrollHeight;
+            return -1;
+        }
+    }
+    function html_next() {
+        nextTable.innerHTML = '';
+        compareTable.innerHTML = '';
+        KMP(str1.value, str2.value);
+    }
+    function html_clear() {
+        con.innerHTML = '';
+    }
+    function html_source() {
+        window.location.href = 'http://www.jianshu.com/p/d7ae3e9dd263';
+    }
+    function html_clear_str1() {
+        str1.value = '';
+    }
+    function html_clear_str2() {
+        str2.value = '';
+    }
+</script>
+</body>
+</html>
