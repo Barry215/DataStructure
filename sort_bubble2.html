@@ -4,13 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
-    <title>简单选择排序算法(高数据)</title>
+    <title>冒泡排序算法(高数据)</title>
     <link rel="stylesheet" href="lib/css/frozen.css">
 </head>
 <body ontouchstart="" style="padding-bottom: 60px">
 <header class="ui-header ui-header-positive ui-border-b">
     <i class="ui-icon-return" onclick="history.back()"></i>
-    <h1>简单选择排序算法(高数据)</h1>
+    <h1>冒泡排序算法(高数据)</h1>
 </header>
 <div class="ui-container">
     <ul class="ui-list ui-list-pure ui-border-tb">
@@ -19,6 +19,10 @@
         </li>
     </ul>
     <ul class="ui-list ui-list-pure ui-border-tb">
+        <li class="ui-border-t">
+            <p><span>标注</span></p>
+            <h4>本算法性能很低，所以将数组大小仅仅设置成了20</h4>
+        </li>
         <li class="ui-border-t">
             <p><span>控制台</span></p>
             <label>
@@ -56,7 +60,7 @@
         con.innerHTML +='初始化：(随机情况)生成了序列:\n'+a+'\n';
         return a;
     }
-    var array = randArray(500,100);
+    var array = randArray(500,20);
     var myChart = echarts.init(document.getElementById('chart'));
     // 指定图表的配置项和数据
     var xs = [];
@@ -79,31 +83,30 @@
 
     // 使用刚指定的配置项和数据显示图表。
     myChart.setOption(option);
-    Array.prototype.selectSort = function () {
-        var min;
+    //冒泡
+    Array.prototype.bubbleSort = function() {
+        var flag = true;
         var s ='';
-        for (var i = 0; i < this.length - 1; i++) {
-            min = i;
-            s +='A：当前查找从第'+i+'位到第'+(this.length - 1)+'位的最小值\n';
-            for (var j = i + 1; j < this.length; j++) {
-                if (this[min] > this[j]) {
-                    min = j;
+        for (var i = 0; i < this.length-1&&flag; i++) {
+            flag = false;
+            for (var j = this.length-2; j >= i; j--) {
+                s += 'A：当前对比'+this[j]+'('+j+')和'+this[j+1]+'('+(j+1)+')\n';
+                if(this[j]>this[j+1]){
+                    var temp = this[j];
+                    this[j] = this[j+1];
+                    this[j+1] = temp;
+                    flag = true;
+                    s += 'B：前后大小反向，故交换\n';
                 }
-            }
-            s +='B：从第'+i+'位到第'+(this.length - 1)+'位的最小值是'+this[min]+'\n';
-            s +='C：'+this[min]+'赋值给第'+i+'位\n';
-            if (i != min) {
-                var temp = this[i];
-                this[i] = this[min];
-                this[min] = temp;
                 arrayStatus.push(this.slice(0));
                 arrayStatusS.push(s);
-                s = '';
+                s= '';
             }
         }
+        console.info('排序后的序列:\n'+this);
     };
     function html_begin() {
-        array.selectSort();
+        array.bubbleSort();
         var i = 0;
         var j =setInterval(function () {
             if(i<arrayStatus.length){
@@ -115,7 +118,7 @@
             }else{
                 clearInterval(j);
             }
-        },250);
+        },100);
     }
     function html_clear() {
         con.innerHTML = '';
