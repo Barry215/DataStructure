@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <title>简单选择排序算法</title>
+    <link rel="stylesheet" href="lib/css/frozen.css">
+</head>
+<body ontouchstart="" style="padding-bottom: 60px">
+<header class="ui-header ui-header-positive ui-border-b">
+    <i class="ui-icon-return" onclick="history.back()"></i>
+    <h1>简单选择排序算法</h1>
+</header>
+<div class="ui-container">
+    <ul class="ui-list ui-list-pure ui-border-tb">
+        <li class="ui-border-t">
+            <div id="chart" style="width: 100%;height:400px;"></div>
+        </li>
+    </ul>
+    <ul class="ui-list ui-list-pure ui-border-tb">
+        <li class="ui-border-t ui-form-item-link" onclick="toV2()">
+            <h4 class="ui-reddot">高数据流下的动画展示</h4>
+        </li>
+        <li class="ui-border-t">
+            <p><span>控制台</span></p>
+            <label>
+                <textarea id="console" style="width: 100%;height: 200px;border: none"></textarea>
+            </label>
+        </li>
+    </ul>
+    <div class="ui-footer ui-footer-stable ui-btn-group ui-border-t">
+        <button class="ui-btn ui-btn-danger" type="button" onclick="html_begin()" id="nextBtn">
+            开始
+        </button>
+        <button class="ui-btn" type="button" onclick="html_clear()">
+            清空控制台
+        </button>
+        <button class="ui-btn" type="button" onclick="window.location.reload()">
+            重玩
+        </button>
+        <button class="ui-btn ui-btn-primary" type="button" onclick="html_source()">
+            查看源代码
+        </button>
+    </div>
+</div>
+<script src="lib/js/zepto.min.js"></script>
+<script src="lib/js/frozen.js"></script>
+<script src="lib/js/echarts.min.js"></script>
+<script>
+    var con = document.getElementById('console');
+    var arrayStatus = [];//存储array每个时刻状态
+    var arrayStatusS = [];//存储控制信息
+    function randArray(max,size){
+        var a = [];
+        for (var i = 0; i < size; i++) {
+            a[i] = parseInt(Math.random()*max);
+        }
+        con.innerHTML +='初始化：(随机情况)生成了序列:\n'+a+'\n';
+        return a;
+    }
+    var array = randArray(500,10);
+    var myChart = echarts.init(document.getElementById('chart'));
+    // 指定图表的配置项和数据
+    var xs = [];
+    for(var i=0;i<array.length;i++){
+        xs.push(i);
+    }
+    var option = {
+        title: {
+            text: '当前数组'
+        },
+        xAxis: {
+            data: xs
+        },
+        yAxis: {},
+        series: [{
+            type: 'bar',
+            data: array.slice(0),
+            label:{
+                normal:{
+                    show:true,
+                    position:'top'
+                }
+            }
+        }]
+    };
+
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+    Array.prototype.selectSort = function () {
+        var min;
+        var s ='';
+        for (var i = 0; i < this.length - 1; i++) {
+            min = i;
+            s +='A：当前查找从第'+i+'位到第'+(this.length - 1)+'位的最小值\n';
+            for (var j = i + 1; j < this.length; j++) {
+                if (this[min] > this[j]) {
+                    min = j;
+                }
+            }
+            s +='B：从第'+i+'位到第'+(this.length - 1)+'位的最小值是'+this[min]+'\n';
+            s +='C：'+this[min]+'赋值给第'+i+'位\n';
+            if (i != min) {
+                var temp = this[i];
+                this[i] = this[min];
+                this[min] = temp;
+                arrayStatus.push(this.slice(0));
+                arrayStatusS.push(s);
+            }
+        }
+    };
+    function html_begin() {
+        array.selectSort();
+        var i = 0;
+        var j =setInterval(function () {
+            if(i<arrayStatus.length){
+                option.series[0].data = arrayStatus[i];
+                myChart.setOption(option);
+                con.innerHTML += arrayStatusS[i];
+                con.scrollTop=con.scrollHeight;
+                i++;
+            }else{
+                clearInterval(j);
+            }
+        },1000);
+    }
+    function html_clear() {
+        con.innerHTML = '';
+    }
+    function html_source() {
+        window.location.href = 'http://www.jianshu.com/p/10a27c3d1b85';
+    }
+    function toV2() {
+        window.location.href = 'sort_select2.html';
+    }
+</script>
+</body>
+</html>
